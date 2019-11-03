@@ -8,25 +8,31 @@ class Search extends React.Component {
 
     constructor(props) {
         super(props)
+        this.page = 0
+        this.totalPages = 0
+        this.searchedText = ""
+
         this.state = { 
             films: [], 
             isLoading: false
         }
-        this.searchedText = ""
-
     }
 
 
     _loadFilms() {
-        this.setState({ isLoading: true })
         if (this.searchedText.length > 0 ) {
-        getFilmsFromApiWithSearchedText(this.searchedText).then(data => 
-            this.setState({ 
-                films: data.results,
-                isLoading: false
-            }))
-        }
+            this.setState({ isLoading: true }) // Loading research
+            getFilmsFromApiWithSearchedText(this.searchedText, this.page+1).then(data => {
+                this.page = data.page
+                this.totalPages = data.total_pages
+                this.setState({ 
+                    films: [ ...this.state.films, ...data.results ],
+                    isLoading: false
+                })
+
+        })
     }
+}
 
     _displayLoading() {
         if (this.state.isLoading) 
@@ -50,10 +56,12 @@ class Search extends React.Component {
                     data={this.state.films}
                     keyExtractor={(item) => item.id.toString()}
                     onEndReachThreshold={0.5}
-                    onEndReached={() => {console.log("onEndReach")
+                    onEndReached={() => {
+                        if (this.page < this.totalPages) {
+                            this._loadFilms()
+                        }
                 }}
-                    renderItem={({item}) => <FilmItem film={item}/>
-                  }
+                    renderItem={({item}) => <FilmItem film={item}/>}
                 />
                 {this._displayLoading()}
             </View>
