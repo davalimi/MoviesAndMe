@@ -47,11 +47,27 @@ class Search extends React.Component {
         this.searchedText = text
     }
 
+    _searchFilms() {
+        this.page = 0
+        this.totalPage = 0
+        this.setState({
+            films: []
+        }, () => { 
+            this._loadFilms()
+        })
+    }
+
     render() {
         return (
             <View style={ styles.main_container }> 
-                <TextInput onSubmitEditing={() => this._loadFilms() } onChangeText={(text) => this._searchTextInputChanged(text)} style={styles.textinput} placeholder="Movie title"/>
-                <Button style={{ height: 50}} title="Search" onPress={() => this._loadFilms()}/>
+                <TextInput 
+                    style={styles.textinput} 
+                    placeholder="Movie title"
+                    onChangeText={(text) => this._searchTextInputChanged(text)} 
+                    onSubmitEditing={() => this._searchFilms()} 
+                />
+
+                <Button style={{ height: 50}} title="Search" onPress={() => this._searchFilms()}/>
                 <FlatList 
                     data={this.state.films}
                     keyExtractor={(item) => item.id.toString()}
