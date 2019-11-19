@@ -1,32 +1,52 @@
 // Components/FilmItem.js
 
 import React from 'react'
-import { StyleSheet, View, Text, Image } from 'react-native'
+import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native'
 import { getImageFromApi } from '../API/TMDBApi'
 
 class FilmItem extends React.Component {
-  render() {
-    const film = this.props.film
-    return (
-      <View style={styles.main_container}>
+
+  _displayFavoriteImage() {
+    if (this.props.isFilmFavorite) {
+      // if props isFilmFavorite is true, we display 🖤
+      return (
         <Image
-          style={styles.image}
-          source={{uri: getImageFromApi(film.poster_path)}}
+          style={styles.favorite_image}
+          source={require('../Images/ic_favorite.png')}
         />
-        <View style={styles.content_container}>
-          <View style={styles.header_container}>
-            <Text style={styles.title_text}>{film.title}</Text>
-            <Text style={styles.vote_text}>{film.vote_average}</Text>
+      )
+    }
+  }
+
+  render() {
+    // const film = this.props.film
+    // const displayDetailForFilm =  this.props.displayDetailForFilm
+    // ES6 syntax (better)
+
+    const { film, displayDetailForFilm } = this.props
+    return (
+      <TouchableOpacity 
+        onPress= {() => displayDetailForFilm(film.id)}
+        style={styles.main_container}>
+          <Image
+            style={styles.image}
+            source={{uri: getImageFromApi(film.poster_path)}}
+          />
+          <View style={styles.content_container}>
+            <View style={styles.header_container}>
+              {this._displayFavoriteImage()}
+              <Text style={styles.title_text}>{film.title}</Text>
+              <Text style={styles.vote_text}>{film.vote_average}</Text>
+            </View>
+            <View style={styles.description_container}>
+              <Text style={styles.description_text} numberOfLines={6}>{film.overview}</Text>
+              {/*  numberOfLines can adapt the text longer if its too long, just need to define maximum lines (6) */}
+            </View>
+            <View style={styles.date_container}>
+              <Text style={styles.date_text}>Sorti le {film.release_date}</Text>
+            </View>
           </View>
-          <View style={styles.description_container}>
-            <Text style={styles.description_text} numberOfLines={6}>{film.overview}</Text>
-            {/* La propriété numberOfLines permet de couper un texte si celui-ci est trop long, il suffit de définir un nombre maximum de ligne */}
-          </View>
-          <View style={styles.date_container}>
-            <Text style={styles.date_text}>Sorti le {film.release_date}</Text>
-          </View>
-        </View>
-      </View>
+      </TouchableOpacity>
     )
   }
 }
@@ -75,7 +95,13 @@ const styles = StyleSheet.create({
   date_text: {
     textAlign: 'right',
     fontSize: 14
+  },
+  favorite_image: {
+    width: 25,
+    height: 25,
+    marginRight: 5
   }
+
 })
 
 export default FilmItem

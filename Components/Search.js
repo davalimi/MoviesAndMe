@@ -2,7 +2,11 @@ import React from 'react'
 import { ActivityIndicator, text, FlatList, View, Button, TextInput, StyleSheet } from 'react-native'
 import films from '../Helpers/filmsData'
 import FilmItem from './FilmItem'
+import FilmList from './FilmList'
 import { getFilmsFromApiWithSearchedText } from '../API/TMDBApi'
+import { ThemeColors } from 'react-navigation'
+import { connect } from 'react-redux'
+
 
 class Search extends React.Component {
 
@@ -13,9 +17,11 @@ class Search extends React.Component {
         this.searchedText = ""
 
         this.state = { 
-            films: [], 
+            films: [],  
             isLoading: false
         }
+
+        this._loadFilms = this._loadFilms.bind(this)
     }
 
 
@@ -57,6 +63,7 @@ class Search extends React.Component {
         })
     }
 
+
     render() {
         return (
             <View style={ styles.main_container }> 
@@ -66,28 +73,22 @@ class Search extends React.Component {
                     onChangeText={(text) => this._searchTextInputChanged(text)} 
                     onSubmitEditing={() => this._searchFilms()} 
                 />
-
-                <Button style={{ height: 50}} title="Search" onPress={() => this._searchFilms()}/>
-                <FlatList 
-                    data={this.state.films}
-                    keyExtractor={(item) => item.id.toString()}
-                    onEndReachThreshold={0.5}
-                    onEndReached={() => {
-                        if (this.page < this.totalPages) {
-                            this._loadFilms()
-                        }
-                }}
-                    renderItem={({item}) => <FilmItem film={item}/>}
+                <FilmList
+                    films={this.state.films}
+                    navigation={this.props.navigation}
+                    loadFilms={this._loadFilms}
+                    page={this.page}
+                    totalPages={this.totalPages}
+                    favoriteList={false}
                 />
                 {this._displayLoading()}
-            </View>
+            </View> 
         )   
     }
 }
 
 const styles = StyleSheet.create ({
     main_container: {
-        marginTop: 20,
         flex: 1
     },
     textinput: {
@@ -109,4 +110,4 @@ const styles = StyleSheet.create ({
     }
 })
 
-export default Search;
+  export default Search
